@@ -1,15 +1,25 @@
 import type { Route } from "./+types/file";
-import {Form, redirect} from "react-router";
+import {Form, redirect, useSearchParams} from "react-router";
 
-export async function loader() {
-    const res = await fetch(`${process.env.API_BASE_URL}/api/files`);
+export async function loader({ request }: Route.LoaderArgs) {
+    const url = new URL(request.url);
+    const category = url.searchParams.get("category");
+
+    const apiUrl = new URL(`${process.env.API_BASE_URL}/api/files`);
+
+    if (category) {
+        apiUrl.searchParams.set("category", category);
+    }
+
+    const res = await fetch(apiUrl.toString());
+
     if (!res.ok) {
         throw new Error("Failed to fetch files");
     }
 
     const files = await res.json();
 
-    return { files };
+    return { files, category };
 }
 
 export async function action({ request }) {
@@ -35,6 +45,8 @@ export async function action({ request }) {
 }
 
 export default function DashboardPage({ loaderData }: Route.ComponentProps) {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const selectedCategory = searchParams.get("category") ?? "";
 
     return (
         <>
@@ -48,6 +60,20 @@ export default function DashboardPage({ loaderData }: Route.ComponentProps) {
                 <h1 className="text-3xl font-extrabold mb-6">
                     Uploaded Files
                 </h1>
+
+                <select
+                    value={selectedCategory}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        setSearchParams(value ? { category: value } : {});
+                    }}
+                    className="border rounded px-3 py-2 text-sm mb-4"
+                >
+                    <option value="">All categories</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                </select>
 
                 {loaderData.files.length === 0 && (
                     <p className="text-lg">No files uploaded yet.</p>

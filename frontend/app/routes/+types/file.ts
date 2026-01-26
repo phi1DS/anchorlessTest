@@ -8,7 +8,9 @@ export type File = {
 };
 
 export type Route = {
-    LoaderArgs: {};
+    LoaderArgs: {
+        request: Request;
+    };
     ComponentProps: {
         loaderData: {
             files: File[];
