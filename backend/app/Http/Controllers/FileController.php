@@ -24,12 +24,12 @@ class FileController extends Controller
     {
         $file = $request->file('file');
         $originalName = $file->getClientOriginalName();
-        $nameWithoutExtension = pathinfo($originalName, PATHINFO_FILENAME);
+        $name = pathinfo($originalName);
 
         $path = $file->store('uploads', 'public');
 
-        $fileEntry = File::create([
-            'name' => $nameWithoutExtension,
+        $fileEntry = File::query()->create([
+            'name' => $name,
             'filepath' => $path,
             'category' => $request->get('category'),
         ]);
@@ -42,7 +42,7 @@ class FileController extends Controller
 
     public function destroy(int $id): \Illuminate\Http\JsonResponse
     {
-        $file = File::findOrFail($id);
+        $file = File::query()->findOrFail($id);
 
         Storage::disk('public')->delete($file->filepath);
 

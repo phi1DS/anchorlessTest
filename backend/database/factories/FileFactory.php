@@ -17,7 +17,7 @@ class FileFactory extends Factory
      */
     public function definition(): array
     {
-        $fakeName = $this->faker->slug();
+        $fakeName = $this->faker->slug(4) . '.pdf';
 
         return [
             'name' => $fakeName,

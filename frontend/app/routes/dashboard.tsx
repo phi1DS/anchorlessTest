@@ -1,4 +1,5 @@
 import type { Route } from "./+types/file";
+import {Form, redirect} from "react-router";
 
 export async function loader() {
     const res = await fetch(`${process.env.API_BASE_URL}/api/files`);
@@ -11,45 +12,76 @@ export async function loader() {
     return { files };
 }
 
+export async function action({ request }) {
+    const formData = await request.formData();
+    const fileId = formData.get("fileId");
+
+    if (!fileId) {
+        throw new Error("Missing file id");
+    }
+
+    const res = await fetch(
+        `${process.env.API_BASE_URL}/api/files/${fileId}`,
+        {
+            method: "DELETE",
+        }
+    );
+
+    if (!res.ok) {
+        throw new Error("Failed to delete file");
+    }
+
+    return redirect("."); // could be improved to remove only the deleted file element without reloading the page
+}
+
 export default function DashboardPage({ loaderData }: Route.ComponentProps) {
 
     return (
-        <div className="max-w-3xl mx-auto p-6">
-            <h1 className="text-3xl font-extrabold text-gray-900 mb-6">
-                Uploaded Files
-            </h1>
+        <>
+            <div className="max-w-3xl mx-auto p-6">
+                <h1 className="text-3xl font-extrabold mb-6">
+                    Upload a file
+                </h1>
+            </div>
 
-            {loaderData.files.length === 0 && (
-                <p className="text-gray-500 text-lg">No files uploaded yet.</p>
-            )}
+            <div className="max-w-3xl mx-auto p-6">
+                <h1 className="text-3xl font-extrabold mb-6">
+                    Uploaded Files
+                </h1>
 
-            {loaderData.files.length > 0 && (
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {loaderData.files.map((file) => (
-                        <li
-                            key={file.id}
-                            className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:bg-gray-50 transition-shadow duration-150"
-                        >
-                            <svg
-                                className="w-6 h-6 text-blue-500 flex-shrink-0"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
+                {loaderData.files.length === 0 && (
+                    <p className="text-lg">No files uploaded yet.</p>
+                )}
+
+                {loaderData.files.length > 0 && (
+                    <ul className="flex flex-wrap gap-4 text-xs">
+                        {loaderData.files.map((file) => (
+                            <li
+                                key={file.id}
+                                className="p-4 border border-gray-200 rounded-lg"
                             >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M7 7v10M17 7v10M7 7h10M7 17h10"
-                                />
-                            </svg>
+                                <p>{file.name}</p>
+                                <p className="text-gray-500 mt-4">Category : {file.category}</p>
 
-                            <span className="text-gray-800 font-medium truncate">{file.name} ({file.category})</span>
-                        </li>
-                    ))}
-                </ul>
-            )}
-        </div>
+                                <Form method="post">
+                                    <input
+                                        type="hidden"
+                                        name="fileId"
+                                        value={file.id}
+                                    />
+
+                                    <button
+                                        type="submit"
+                                        className="mt-4 text-red-500 hover:underline hover:cursor-pointer text-xs"
+                                    >
+                                        Delete
+                                    </button>
+                                </Form>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+        </>
     );
 }
