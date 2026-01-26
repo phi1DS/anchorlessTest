@@ -1,15 +1,14 @@
 import type { Route } from "./+types/file";
 
 export async function loader() {
-    // const res = await fetch(`${process.env.API_BASE_URL}/api/files`);
-    // if (!res.ok) {
-    //     throw new Error("Failed to fetch files");
-    // }
-    // const files: string[] = await res.json();
-    //
-    // return { files };
+    const res = await fetch(`${process.env.API_BASE_URL}/api/files`);
+    if (!res.ok) {
+        throw new Error("Failed to fetch files");
+    }
 
-    return { files: [] };
+    const files = await res.json();
+
+    return { files };
 }
 
 export default function DashboardPage({ loaderData }: Route.ComponentProps) {
@@ -28,7 +27,7 @@ export default function DashboardPage({ loaderData }: Route.ComponentProps) {
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {loaderData.files.map((file) => (
                         <li
-                            key={file.name}
+                            key={file.id}
                             className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:bg-gray-50 transition-shadow duration-150"
                         >
                             <svg
@@ -46,7 +45,7 @@ export default function DashboardPage({ loaderData }: Route.ComponentProps) {
                                 />
                             </svg>
 
-                            <span className="text-gray-800 font-medium truncate">{file.name}</span>
+                            <span className="text-gray-800 font-medium truncate">{file.name} ({file.category})</span>
                         </li>
                     ))}
                 </ul>
