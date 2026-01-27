@@ -53,7 +53,25 @@ export async function action({ request }: Route.ActionArgs) {
         const res = await fetch(`${process.env.API_BASE_URL}/api/files`, {
             method: "POST",
             body: formData,
+            headers: {
+                "Accept": "application/json",
+            },
         });
+
+        if (res.status === 422) {
+            const data = await res.json();
+
+            return new Response(JSON.stringify({
+                error: data.errors?.file?.[0] ??
+                    data.message ??
+                    "Invalid file type"
+                }),
+                {
+                    status: 422,
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
+        }
 
         if (!res.ok) {
             return new Response(JSON.stringify({ error: "Failed to upload file" }), {
