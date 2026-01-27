@@ -1,72 +1,59 @@
-import {useFetcher, useLoaderData} from "react-router";
-import type {LoaderData} from "./+types/types.ts";
-import {FileUploadForm} from "~/dashboard/FileUploadForm";
-import {FileList} from "~/dashboard/FileList";
+import { useFetcher, useLoaderData } from "react-router";
+import type { LoaderData } from "~/+types/types.ts";
+import { FileUploadForm } from "~/dashboard/FileUploadForm";
+import { FileList } from "~/dashboard/FileList";
+import { fetchFiles, uploadFile, deleteFile } from "~/api/file.tsx";
+
+function jsonResponse(data: unknown, status = 200) {
+    return new Response(JSON.stringify(data), {
+        status,
+        headers: { "Content-Type": "application/json" },
+    });
+}
 
 export async function loader({ request }) {
     const url = new URL(request.url);
     const category = url.searchParams.get("category");
-    const apiUrl = new URL(`${process.env.API_BASE_URL}/api/files`);
-    if (category) {
-        apiUrl.searchParams.set("category", category);
-    }
 
-    const res = await fetch(apiUrl.toString());
-    if (!res.ok) {
-        throw new Error("Failed to fetch files");
-    }
-
-    const files = await res.json();
+    const files = await fetchFiles(category);
 
     return { files, category };
 }
 
 export async function action({ request }) {
-    function jsonResponse(data: unknown, status = 200) {
-        return new Response(JSON.stringify(data), {
-            status,
-            headers: { "Content-Type": "application/json" },
-        });
-    }
-
     const formData = await request.formData();
     const actionType = formData.get("_action");
 
     if (actionType === "delete") {
         const fileId = formData.get("fileId");
+
         if (!fileId) {
             return jsonResponse({ error: "Missing file id" }, 400);
         }
 
-        const res = await fetch(`${process.env.API_BASE_URL}/api/files/${fileId}`, { method: "DELETE" });
+        const res = await deleteFile(String(fileId));
+
         if (!res.ok) {
             return jsonResponse({ error: "Failed to delete file" }, 500);
         }
 
-        return jsonResponse({ success: "File deleted successfully" }, 200);
+        return jsonResponse({ success: "File deleted successfully" });
     }
 
     if (actionType === "upload") {
-        const res = await fetch(`${process.env.API_BASE_URL}/api/files`, {
-            method: "POST",
-            body: formData,
-            headers: {
-                "Accept": "application/json",
-            },
-        });
+        const res = await uploadFile(formData);
 
         if (res.status === 422) {
             const data = await res.json();
 
-            return new Response(JSON.stringify({
-                error: data.errors?.file?.[0] ??
-                    data.message ??
-                    "Invalid file type"
-                }),
+            return jsonResponse(
                 {
-                    status: 422,
-                    headers: { "Content-Type": "application/json" },
-                }
+                    error:
+                        data.errors?.file?.[0] ??
+                        data.message ??
+                        "Invalid file type",
+                },
+                422
             );
         }
 
@@ -74,15 +61,14 @@ export async function action({ request }) {
             return jsonResponse({ error: "Failed to upload file" }, 500);
         }
 
-        return jsonResponse({ success: "File uploaded successfully" }, 200);
+        return jsonResponse({ success: "File uploaded successfully" });
     }
 
     return jsonResponse({ error: "Unknown action" }, 400);
 }
 
 export default function DashboardPage() {
-    const loaderData = useLoaderData<LoaderData>();
-
+    const { files } = useLoaderData<LoaderData>();
     const actionFetcher = useFetcher();
 
     const feedback =
@@ -93,18 +79,24 @@ export default function DashboardPage() {
         <>
             <div className="max-w-3xl mx-auto p-6">
                 {feedback && (
-                    <p className="mb-4 text-sm text-green-600">
+                    <p
+                        className={`mb-4 text-sm ${
+                            actionFetcher.data?.error
+                                ? "text-red-600"
+                                : "text-green-600"
+                        }`}
+                    >
                         {feedback}
                     </p>
                 )}
             </div>
 
             <div className="max-w-3xl mx-auto p-6">
-                <FileUploadForm fetcher={actionFetcher}/>
+                <FileUploadForm fetcher={actionFetcher} />
             </div>
 
             <div className="max-w-3xl mx-auto p-6">
-                <FileList files={loaderData.files} fetcher={actionFetcher}/>
+                <FileList files={files} fetcher={actionFetcher} />
             </div>
         </>
     );
