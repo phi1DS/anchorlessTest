@@ -6,13 +6,23 @@ A simple file uploader with Laravel Remix
 
 # Setup
 
+## Docker setup (Recommended)
+
+1. Build and start the containers:
+   ```bash
+   docker-compose up --build
+   ```
+2. The frontend will be available at `http://localhost:5173` and the backend at `http://localhost:8000`.
+
+## Local setup
+
 Reqs (my env):
-- php 8.5+
+- php 8.4+
 - composer 2.9.2+
 - npm 10+
 - node 22+
 
-## backend folder
+### backend folder
 
 ````
 composer i
@@ -23,29 +33,30 @@ php artisan storage:link
 ````
 (sqlite as DB)
 
-## frontend folder
+### frontend folder
 
 ````
 npm i
+cp .env.example .env
 ````
 
-# Launch local setup
+## Start hosting locally
 
-## backend folder
+### backend folder
 
 ````
 php artisan serve
 ````
 -> localhost:8000
 
-## frontend folder
+### frontend folder
 
 ````
 npm run dev 
 ````
 -> localhost:5173
 
-# TODO : Instructions to test the upload and delete features
+# Instructions to test the upload and delete features
 
 1. go to http://localhost:5173/ in your browser
 2. Click on the "Choose file" form input
@@ -55,4 +66,4 @@ npm run dev
 6. Click on the "Delete" button next to the uploaded file
 7. Confirm the deletion
 
-Possible to filter by the 3 categories.
+Possible to filter by categories.
