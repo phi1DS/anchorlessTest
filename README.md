@@ -1,6 +1,12 @@
+# Laravel-Remix file uploader
+
+A simple file uploader with Laravel Remix
+
+![Homepage](./img.png)
+
 # Setup
 
-reqs (my env):
+Reqs (my env):
 - php 8.5+
 - composer 2.9.2+
 - npm 10+

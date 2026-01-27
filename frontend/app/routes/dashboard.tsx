@@ -161,6 +161,7 @@ export default function DashboardPage({ loaderData }: Route.ComponentProps) {
                 </h1>
 
                 <select
+                    id="category-select"
                     value={selectedCategory}
                     onChange={(e) => {
                         const value = e.target.value;
@@ -180,33 +181,60 @@ export default function DashboardPage({ loaderData }: Route.ComponentProps) {
 
                 {loaderData.files.length > 0 && (
                     <ul className="flex flex-wrap gap-4 text-xs">
-                        {loaderData.files.map((file) => (
-                            <li
-                                key={file.id}
-                                className="p-4 border border-gray-200 rounded-lg"
-                            >
-                                <p>{file.name}</p>
-                                <p className="text-gray-500 mt-4">Category : {file.category}</p>
+                        {loaderData.files.map((file) => {
+                            // determine file type by extension
+                            const ext = file.name.split(".").pop()?.toLowerCase();
+                            const isImage = ["jpg", "jpeg", "png", "gif"].includes(ext);
+                            const isPdf = ext === "pdf";
 
-                                <deleteFetcher.Form method="post">
-                                    <input type="hidden" name="_action" value="delete" />
-                                    <input
-                                        type="hidden"
-                                        name="fileId"
-                                        value={file.id}
-                                    />
+                            console.log(file.filepath);
 
-                                    <button
-                                        type="submit"
-                                        className="mt-4 text-red-500 hover:underline hover:cursor-pointer text-xs"
-                                    >
-                                        {deleteFetcher.state === "submitting"
-                                            ? "Deleting..."
-                                            : "Delete"}
-                                    </button>
-                                </deleteFetcher.Form>
-                            </li>
-                        ))}
+                            return (
+                                <li
+                                    key={file.id}
+                                    className="p-4 border border-gray-200 rounded-lg flex items-center gap-3"
+                                >
+                                    {/* File preview */}
+                                    <div className="w-12 h-12 flex-shrink-0">
+                                        {isImage && (
+                                            <img
+                                                src={`${import.meta.env.VITE_API_BASE_URL}/storage/${file.filepath}`}
+                                                alt={file.name}
+                                                className="w-full h-full object-cover rounded"
+                                            />
+                                        )}
+                                        {isPdf && (
+                                            <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded text-gray-600 text-xs font-bold">
+                                                PDF
+                                            </div>
+                                        )}
+                                        {!isImage && !isPdf && (
+                                            <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded text-gray-600 text-xs font-bold">
+                                                FILE
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* File info + actions */}
+                                    <div className="flex-1">
+                                        <p className="font-medium text-gray-800">{file.name}</p>
+                                        <p className="text-gray-500 mt-1 text-sm">Category: {file.category}</p>
+
+                                        <deleteFetcher.Form method="post" className="mt-2">
+                                            <input type="hidden" name="_action" value="delete" />
+                                            <input type="hidden" name="fileId" value={file.id} />
+
+                                            <button
+                                                type="submit"
+                                                className="text-red-500 hover:underline hover:cursor-pointer text-xs"
+                                            >
+                                                {deleteFetcher.state === "submitting" ? "Deleting..." : "Delete"}
+                                            </button>
+                                        </deleteFetcher.Form>
+                                    </div>
+                                </li>
+                            );
+                        })}
                     </ul>
                 )}
             </div>
