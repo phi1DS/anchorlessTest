@@ -24,7 +24,7 @@ export function FileList({ files, fetcher }: Props) {
                     const value = e.target.value;
                     setSearchParams(value ? { category: value } : {});
                 }}
-                className="border rounded px-3 py-2 text-sm mb-4"
+                className="border rounded px-3 py-2 text-sm text-black mb-4 bg-white"
             >
                 <option value="">All categories</option>
                 <option value="A">A</option>

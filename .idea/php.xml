@@ -130,6 +130,7 @@
       <path value="$PROJECT_DIR$/backend/vendor/symfony/mailer" />
       <path value="$PROJECT_DIR$/backend/vendor/symfony/string" />
       <path value="$PROJECT_DIR$/backend/vendor/symfony/finder" />
+      <path value="$PROJECT_DIR$/backend/vendor/_laravel_idea" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2" />

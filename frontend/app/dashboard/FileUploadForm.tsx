@@ -17,7 +17,7 @@ export function FileUploadForm({ fetcher }: { fetcher: ReturnType<typeof useFetc
 
                 <input type="file" name="file" required className="block text-sm" />
 
-                <select name="category" required className="border rounded px-3 py-2 text-sm">
+                <select name="category" required className="border rounded px-3 py-2 text-sm text-black bg-white">
                     <option value="" disabled>Select category</option>
                     <option value="A">A</option>
                     <option value="B">B</option>

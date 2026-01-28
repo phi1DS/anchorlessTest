@@ -2,14 +2,7 @@ import { useFetcher, useLoaderData } from "react-router";
 import type { LoaderData } from "~/+types/types.ts";
 import { FileUploadForm } from "~/dashboard/FileUploadForm";
 import { FileList } from "~/dashboard/FileList";
-import { fetchFiles, uploadFile, deleteFile } from "~/api/file.tsx";
-
-function jsonResponse(data: unknown, status = 200) {
-    return new Response(JSON.stringify(data), {
-        status,
-        headers: { "Content-Type": "application/json" },
-    });
-}
+import { fetchFiles, uploadFile, deleteFile, jsonResponse } from "~/api/file.tsx";
 
 export async function loader({ request }) {
     const url = new URL(request.url);
