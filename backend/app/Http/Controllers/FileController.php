@@ -24,7 +24,7 @@ class FileController extends Controller
     {
         $file = $request->file('file');
         $originalName = $file->getClientOriginalName();
-        $name = pathinfo($originalName, PATHINFO_BASENAME);
+        $name = pathinfo($originalName, PATHINFO_FILENAME);
 
         $path = $file->store('uploads', 'public');
 

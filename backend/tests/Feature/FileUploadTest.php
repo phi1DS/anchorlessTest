@@ -19,7 +19,7 @@ class FileUploadTest extends TestCase
         $fileName = 'test_document.pdf';
         $file = UploadedFile::fake()->create($fileName, 1024); // 1MB
 
-        $response = $this->postJson('/api/file/upload', [
+        $response = $this->postJson('/api/files', [
             'file' => $file,
             'category' => 'A',
         ]);
@@ -48,7 +48,7 @@ class FileUploadTest extends TestCase
 
         $file = UploadedFile::fake()->create('document.txt', 100);
 
-        $response = $this->postJson('/api/file/upload', [
+        $response = $this->postJson('/api/files', [
             'file' => $file,
         ]);
 
@@ -62,7 +62,7 @@ class FileUploadTest extends TestCase
 
         $file = UploadedFile::fake()->create('large_image.jpg', 5000); // ~5MB
 
-        $response = $this->postJson('/api/file/upload', [
+        $response = $this->postJson('/api/files', [
             'file' => $file,
         ]);
 

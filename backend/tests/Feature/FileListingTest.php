@@ -25,7 +25,7 @@ class FileListingTest extends TestCase
             'category' => Category::B,
         ]);
 
-        $response = $this->getJson('/api/file');
+        $response = $this->getJson('/api/files');
 
         $response->assertStatus(200)
             ->assertJsonCount(2)
@@ -47,7 +47,7 @@ class FileListingTest extends TestCase
             'category' => Category::B,
         ]);
 
-        $response = $this->getJson('/api/file?category=A');
+        $response = $this->getJson('/api/files?category=A');
 
         $response->assertStatus(200)
             ->assertJsonCount(1)
@@ -63,7 +63,7 @@ class FileListingTest extends TestCase
             'category' => Category::A,
         ]);
 
-        $response = $this->getJson('/api/file?category=C');
+        $response = $this->getJson('/api/files?category=C');
 
         $response->assertStatus(200)
             ->assertJsonCount(0);

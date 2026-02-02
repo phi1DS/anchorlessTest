@@ -24,7 +24,7 @@ class FileDeleteTest extends TestCase
 
         Storage::disk('public')->put('uploads/test_file.pdf', 'dummy content');
 
-        $response = $this->deleteJson("/api/file/{$fileEntry->id}");
+        $response = $this->deleteJson("/api/files/{$fileEntry->id}");
 
         $response->assertStatus(200)
             ->assertJson(['message' => 'File deleted successfully']);
@@ -38,7 +38,7 @@ class FileDeleteTest extends TestCase
 
     public function test_returns_404_when_deleting_non_existent_file(): void
     {
-        $response = $this->deleteJson('/api/file/999');
+        $response = $this->deleteJson('/api/files/999');
 
         $response->assertStatus(404);
     }
